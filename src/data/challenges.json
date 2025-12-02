@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "title": "Drink 2L of Water",
+    "description": "Stay hydrated by drinking 2 liters of water today!",
+    "category": "Health",
+    "difficulty": "Easy"
+  },
+  {
+    "id": 2,
+    "title": "Read 10 Pages",
+    "description": "Read at least 10 pages of a non-fiction book.",
+    "category": "Learning",
+    "difficulty": "Medium"
+  },
+  {
+    "id": 3,
+    "title": "30 Pushups",
+    "description": "Complete 30 pushups in a single session.",
+    "category": "Fitness",
+    "difficulty": "Hard"
+  }
+]
