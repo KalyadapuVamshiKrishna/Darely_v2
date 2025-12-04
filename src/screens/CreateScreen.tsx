@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, TextInput, Alert, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { TextInput, Alert, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { YStack, Text, Button, XStack } from 'tamagui';
 import { useNavigation } from '@react-navigation/native';
 import { ChallengeContext } from '../context/ChallengeContext';
@@ -32,7 +32,6 @@ export const CreateScreen = () => {
     navigation.goBack();
   };
 
-  // Helper for selection buttons
   const SelectButton = ({ label, selected, onPress }: any) => (
     <TouchableOpacity 
       onPress={onPress}
@@ -49,10 +48,12 @@ export const CreateScreen = () => {
   );
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={{ padding: 20 }}>
+    <ScrollView 
+      style={{ flex: 1, backgroundColor: colors.background }} 
+      // FIX: Increased paddingTop to 120 to clear the header completely
+      contentContainerStyle={{ padding: 20, paddingTop: 120, paddingBottom: 50 }} 
+    >
       <YStack space="$4">
-        <Text fontSize="$8" fontWeight="bold" color={colors.text}>New Challenge</Text>
-
         {/* Title Input */}
         <YStack space="$2">
           <Text color={colors.subText} fontWeight="600">Title</Text>
