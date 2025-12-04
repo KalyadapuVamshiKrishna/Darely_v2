@@ -1,19 +1,18 @@
 import React, { useContext } from 'react';
 import { FlatList, RefreshControl, View, StatusBar, TouchableOpacity, StyleSheet } from 'react-native';
-import { Spinner, YStack, Text } from 'tamagui';
+import { Spinner, Text } from 'tamagui'; 
+import { SafeAreaView } from 'react-native-safe-area-context'; // Fixes the top notch collision
 import { ChallengeCard } from '../components/ChallengeCard';
-import { ChallengeContext } from '../context/ChallengeContext'; // Import Context
+import { ChallengeContext } from '../context/ChallengeContext';
 import { useNavigation } from '@react-navigation/native';
 import { useThemeColors } from '../hooks/useThemeColors';
-// We can use a simple text or an icon for the FAB
-import { Plus } from '@tamagui/lucide-icons'; // Or just use Text "+" if icons fail
 
 export const HomeScreen = () => {
-  // 1. Consume Context
   const { challenges, isLoading, refresh } = useContext(ChallengeContext);
   const navigation = useNavigation<any>();
   const { colors, isDark } = useThemeColors();
 
+  // Loading State
   if (isLoading && challenges.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
@@ -23,11 +22,14 @@ export const HomeScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    // edges={['top']} ensures we strictly respect the top notch
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
+      
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
       
-      <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
-        <Text fontSize="$8" fontWeight="800" color={colors.text} marginBottom="$2">
+      {/* Custom Header Title */}
+      <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 10 }}>
+        <Text fontSize="$8" fontWeight="800" color={colors.text}>
           Daily Goals 🎯
         </Text>
       </View>
@@ -46,7 +48,9 @@ export const HomeScreen = () => {
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={colors.text} />
         }
-        contentContainerStyle={{ paddingBottom: 80, paddingTop: 10 }} // Extra padding for FAB
+        // paddingBottom: 100 ensures the last item isn't hidden behind the FAB
+        contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }} 
+        showsVerticalScrollIndicator={false}
       />
 
       {/* Floating Action Button (FAB) */}
@@ -55,9 +59,9 @@ export const HomeScreen = () => {
         onPress={() => navigation.navigate('Create')}
         activeOpacity={0.8}
       >
-        <Text fontSize={30} color="white" lineHeight={30}>+</Text>
+        <Text fontSize={30} color="white" lineHeight={30} marginBottom={4}>+</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -71,10 +75,11 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#000',
+    elevation: 5, // Android Shadow
+    shadowColor: '#000', // iOS Shadow
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+    zIndex: 100,
   }
 });

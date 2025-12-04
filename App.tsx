@@ -1,37 +1,15 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-<<<<<<< HEAD
-
-import HomeScreen from './src/screens/HomeScreen';
-import DetailsScreen from './src/screens/DetailsScreen';
-import { RootStackParamList } from './src/types';
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen 
-          name="Home" 
-          component={HomeScreen} 
-          options={{ title: 'Challenges' }}
-        />
-        <Stack.Screen 
-          name="Details" 
-          component={DetailsScreen} 
-          options={{ title: 'Challenge Details' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-=======
 import { TamaguiProvider, Theme } from 'tamagui';
 import { useFonts } from 'expo-font';
+import { SafeAreaProvider } from 'react-native-safe-area-context'; // <--- IMPORT THIS
 import config from './src/theme/tamagui.config';
 
+import { ChallengeProvider } from './src/context/ChallengeContext'; 
 import { HomeScreen } from './src/screens/HomeScreen';
 import { DetailsScreen } from './src/screens/DetailsScreen';
+import { CreateScreen } from './src/screens/CreateScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,37 +19,50 @@ export default function App() {
     InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
   });
 
-  if (!loaded) {
-    return null;
-  }
+  if (!loaded) return null;
 
   return (
     <TamaguiProvider config={config}>
       <Theme name="light">
-        <NavigationContainer>
-          <Stack.Navigator 
-            initialRouteName="Home"
-            screenOptions={{
-              headerStyle: { backgroundColor: '#fff' },
-              headerTintColor: '#000',
-              headerTitleStyle: { fontWeight: 'bold' },
-              contentStyle: { backgroundColor: '#fff' }
-            }}
-          >
-            <Stack.Screen 
-              name="Home" 
-              component={HomeScreen} 
-              options={{ title: 'Daily Challenges' }} 
-            />
-            <Stack.Screen 
-              name="Details" 
-              component={DetailsScreen} 
-              options={{ title: 'Challenge Details' }} 
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <ChallengeProvider>
+          <SafeAreaProvider>
+            <NavigationContainer>
+              <Stack.Navigator 
+                initialRouteName="Home"
+                screenOptions={{
+                  headerShown: false, 
+                  contentStyle: { backgroundColor: 'transparent' }
+                }}
+              >
+                <Stack.Screen name="Home" component={HomeScreen} />
+                
+                <Stack.Screen 
+                  name="Details" 
+                  component={DetailsScreen} 
+                  options={{ 
+                    headerShown: true, 
+                    title: '', 
+                    headerTransparent: true, // Header floats over content
+                    headerTintColor: '#000'
+                  }} 
+                />
+                
+                <Stack.Screen 
+                  name="Create" 
+                  component={CreateScreen} 
+                  options={{ 
+                    headerShown: true, 
+                    title: 'New Challenge', 
+                    presentation: 'modal',
+                    headerTransparent: true, // Header floats over content
+                    headerTintColor: '#000'
+                  }} 
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </SafeAreaProvider>
+        </ChallengeProvider>
       </Theme>
     </TamaguiProvider>
->>>>>>> fe4354d (Integrate tamagui)
   );
 }

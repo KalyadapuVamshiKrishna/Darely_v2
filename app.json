@@ -1,12 +1,7 @@
 {
   "expo": {
-<<<<<<< HEAD
-    "name": "ChallengeApp",
-    "slug": "ChallengeApp",
-=======
     "name": "challenge-app",
     "slug": "challenge-app",
->>>>>>> fe4354d (Integrate tamagui)
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
