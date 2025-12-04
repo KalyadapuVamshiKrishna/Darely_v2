@@ -6,7 +6,7 @@ const appConfig = createTamagui(config)
 export type AppConfig = typeof appConfig
 
 declare module 'tamagui' {
-  // this makes typescript happy
+
   interface TamaguiCustomConfig extends AppConfig {}
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native'; // Standard RN components for layout
+import { View, StyleSheet, Pressable } from 'react-native';
 import { Text, XStack } from 'tamagui';
 import { Challenge } from '../data/types';
 import { useThemeColors } from '../hooks/useThemeColors';
@@ -36,7 +36,7 @@ export const ChallengeCard = ({ item, onPress }: Props) => {
         { 
           backgroundColor: colors.cardBg,
           borderColor: colors.border,
-          transform: [{ scale: pressed ? 0.98 : 1 }] // Subtle press animation
+          transform: [{ scale: pressed ? 0.98 : 1 }] 
         }
       ]}
     >

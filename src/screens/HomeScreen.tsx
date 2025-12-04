@@ -1,18 +1,18 @@
 import React, { useContext } from 'react';
 import { FlatList, RefreshControl, View, StatusBar, TouchableOpacity, StyleSheet } from 'react-native';
-import { Spinner, Text } from 'tamagui'; 
-import { SafeAreaView } from 'react-native-safe-area-context'; // Fixes the top notch collision
+import { Spinner, Text, XStack } from 'tamagui'; 
+import { SafeAreaView } from 'react-native-safe-area-context'; 
 import { ChallengeCard } from '../components/ChallengeCard';
 import { ChallengeContext } from '../context/ChallengeContext';
 import { useNavigation } from '@react-navigation/native';
 import { useThemeColors } from '../hooks/useThemeColors';
 
 export const HomeScreen = () => {
-  const { challenges, isLoading, refresh } = useContext(ChallengeContext);
+  // Extract toggleTheme and isDarkMode from context
+  const { challenges, isLoading, refresh, toggleTheme, isDarkMode } = useContext(ChallengeContext);
   const navigation = useNavigation<any>();
-  const { colors, isDark } = useThemeColors();
+  const { colors } = useThemeColors();
 
-  // Loading State
   if (isLoading && challenges.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
@@ -22,17 +22,31 @@ export const HomeScreen = () => {
   }
 
   return (
-    // edges={['top']} ensures we strictly respect the top notch
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       
-      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
       
-      {/* Custom Header Title */}
-      <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 10 }}>
+      {/* Header with Title and Toggle Button */}
+      <XStack justifyContent="space-between" alignItems="center" paddingHorizontal={16} paddingTop={10} paddingBottom={10}>
         <Text fontSize="$8" fontWeight="800" color={colors.text}>
           Daily Goals 🎯
         </Text>
-      </View>
+
+        {/* Theme Toggle Button */}
+        <TouchableOpacity 
+          onPress={toggleTheme}
+          style={{ 
+            backgroundColor: colors.cardBg, 
+            padding: 8, 
+            borderRadius: 20, 
+            borderWidth: 1, 
+            borderColor: colors.border 
+          }}
+        >
+          {/* Using Emoji as a lightweight icon */}
+          <Text fontSize={20}>{isDarkMode ? '🌙' : '☀️'}</Text>
+        </TouchableOpacity>
+      </XStack>
 
       <FlatList
         data={challenges}
@@ -48,12 +62,10 @@ export const HomeScreen = () => {
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={colors.text} />
         }
-        // paddingBottom: 100 ensures the last item isn't hidden behind the FAB
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }} 
         showsVerticalScrollIndicator={false}
       />
 
-      {/* Floating Action Button (FAB) */}
       <TouchableOpacity 
         style={[styles.fab, { backgroundColor: colors.primary }]}
         onPress={() => navigation.navigate('Create')}
@@ -75,8 +87,8 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5, // Android Shadow
-    shadowColor: '#000', // iOS Shadow
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

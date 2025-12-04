@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { TamaguiProvider, Theme } from 'tamagui';
 import { useFonts } from 'expo-font';
-import { SafeAreaProvider } from 'react-native-safe-area-context'; // <--- IMPORT THIS
+import { SafeAreaProvider } from 'react-native-safe-area-context'; 
 import config from './src/theme/tamagui.config';
 
 import { ChallengeProvider } from './src/context/ChallengeContext'; 
@@ -42,7 +42,7 @@ export default function App() {
                   options={{ 
                     headerShown: true, 
                     title: '', 
-                    headerTransparent: true, // Header floats over content
+                    headerTransparent: true, 
                     headerTintColor: '#000'
                   }} 
                 />
@@ -54,7 +54,7 @@ export default function App() {
                     headerShown: true, 
                     title: 'New Challenge', 
                     presentation: 'modal',
-                    headerTransparent: true, // Header floats over content
+                    headerTransparent: true, 
                     headerTintColor: '#000'
                   }} 
                 />

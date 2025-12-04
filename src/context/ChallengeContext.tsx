@@ -1,10 +1,9 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { LayoutAnimation, UIManager, Platform } from 'react-native';
+import { LayoutAnimation, UIManager, Platform, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Challenge } from '../data/types';
 import { fetchChallenges } from '../services/api';
 
-// Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
@@ -14,38 +13,46 @@ interface ChallengeContextType {
   addChallenge: (newChallenge: Omit<Challenge, 'id'>) => void;
   isLoading: boolean;
   refresh: () => void;
+  // New Theme Props
+  isDarkMode: boolean;
+  toggleTheme: () => void;
 }
 
 export const ChallengeContext = createContext<ChallengeContextType>({} as ChallengeContextType);
 
 const STORAGE_KEY = '@challenge_app_data_v1';
+const THEME_KEY = '@app_theme_preference';
 
 export const ChallengeProvider = ({ children }: { children: ReactNode }) => {
+  const systemScheme = useColorScheme();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Initialize theme based on system, but allow override
+  const [isDarkMode, setIsDarkMode] = useState(systemScheme === 'dark');
 
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // 1. Try to pull data from Local Storage (Disk)
+      // 1. Load Data
       const storedData = await AsyncStorage.getItem(STORAGE_KEY);
-
       if (storedData) {
-        // A. If data exists on disk, use it!
-        console.log('📦 Loaded from Storage');
         setChallenges(JSON.parse(storedData));
       } else {
-        // B. If no data on disk (First launch), load defaults from JSON
-        console.log('🌐 Loaded from "API" (Default JSON)');
         const apiData = await fetchChallenges();
         const sortedData = apiData.reverse();
-        
         setChallenges(sortedData);
-        // Save these defaults to disk immediately so we have them next time
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(sortedData));
       }
+
+      // 2. Load Theme Preference
+      const savedTheme = await AsyncStorage.getItem(THEME_KEY);
+      if (savedTheme !== null) {
+        // If user has saved a preference, respect it
+        setIsDarkMode(savedTheme === 'dark');
+      }
     } catch (error) {
-      console.error("Failed to load challenges", error);
+      console.error("Failed to load data", error);
     } finally {
       setIsLoading(false);
     }
@@ -56,37 +63,28 @@ export const ChallengeProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const addChallenge = async (newChallenge: Omit<Challenge, 'id'>) => {
-    // 1. Trigger UI Animation
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
-    // 2. Create the new object
-    const item: Challenge = {
-      id: Date.now().toString(),
-      ...newChallenge
-    };
-
-    // 3. Create the new list (New item at top)
+    const item: Challenge = { id: Date.now().toString(), ...newChallenge };
     const updatedList = [item, ...challenges];
-
-    // 4. Update State (Instant UI update)
     setChallenges(updatedList);
-
-    // 5. Persist to Disk (Background save)
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
-      console.log('💾 Saved new list to storage');
-    } catch (e) {
-      console.error('Failed to save to storage', e);
-    }
+    } catch (e) { console.error(e); }
   };
 
-  // Force a reset (Optional: helps for debugging)
-  const refresh = async () => {
-    loadData();
+  const refresh = async () => { loadData(); };
+
+  // New Toggle Function
+  const toggleTheme = async () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode); // Update UI immediately
+    try {
+      await AsyncStorage.setItem(THEME_KEY, newMode ? 'dark' : 'light');
+    } catch (e) { console.error(e); }
   };
 
   return (
-    <ChallengeContext.Provider value={{ challenges, addChallenge, isLoading, refresh }}>
+    <ChallengeContext.Provider value={{ challenges, addChallenge, isLoading, refresh, isDarkMode, toggleTheme }}>
       {children}
     </ChallengeContext.Provider>
   );

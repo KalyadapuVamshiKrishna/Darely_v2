@@ -1,18 +1,21 @@
-import { useColorScheme } from 'react-native';
+import { useContext } from 'react';
+import { ChallengeContext } from '../context/ChallengeContext';
 
 export const useThemeColors = () => {
-  const scheme = useColorScheme(); // Detects 'light' or 'dark' from the phone settings
-  const isDark = scheme === 'dark';
+  // Now we get the theme from our Global State, not the phone settings
+  const { isDarkMode } = useContext(ChallengeContext);
 
   return {
-    isDark,
+    isDark: isDarkMode,
     colors: {
-      background: isDark ? '#121212' : '#F5F7FA', // Soft gray for light mode, deep black for dark
-      cardBg: isDark ? '#1E1E1E' : '#FFFFFF',
-      text: isDark ? '#FFFFFF' : '#1A1A1A',
-      subText: isDark ? '#A0A0A0' : '#64748B',
-      border: isDark ? '#333333' : '#E2E8F0',
-      primary: '#3B82F6', // A professional Blue
+      background: isDarkMode ? '#121212' : '#F5F7FA',
+      cardBg: isDarkMode ? '#1E1E1E' : '#FFFFFF',
+      text: isDarkMode ? '#FFFFFF' : '#1A1A1A',
+      subText: isDarkMode ? '#A0A0A0' : '#64748B',
+      border: isDarkMode ? '#333333' : '#E2E8F0',
+      primary: '#3B82F6',
+      // Dynamic Shadow Color
+      shadow: isDarkMode ? '#000000' : '#000000',
     }
   };
 };
