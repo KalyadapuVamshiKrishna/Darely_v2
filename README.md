@@ -113,8 +113,8 @@ Expo 54 uses React 19 Beta, which breaks Tamagui's static compiler.
 
 ## ScreenShots
 
-![Home Screen](assets/home_light.png)
-![Details Screen](assets/details_light.png)
+![Home Screen](assets/home_light.jpeg)
+![Details Screen](assets/details_light.jpeg)
 ![Create Challenge](assets/createPage_light.jpeg)
 ![Home Screen](assets/home_dark.jpeg)
 ![Details Screen](assets/detailsPage_dark.jpeg)
