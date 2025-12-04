@@ -1,74 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useContext } from 'react';
+import { FlatList, RefreshControl, View, StatusBar, TouchableOpacity, StyleSheet } from 'react-native';
+import { Spinner, YStack, Text } from 'tamagui';
+import { ChallengeCard } from '../components/ChallengeCard';
+import { ChallengeContext } from '../context/ChallengeContext'; // Import Context
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useThemeColors } from '../hooks/useThemeColors';
+// We can use a simple text or an icon for the FAB
+import { Plus } from '@tamagui/lucide-icons'; // Or just use Text "+" if icons fail
 
-import { Challenge, RootStackParamList } from '../types';
-import { fetchChallenges } from '../data/api';
-import ChallengeCard from '../components/ChallengeCard';
+export const HomeScreen = () => {
+  // 1. Consume Context
+  const { challenges, isLoading, refresh } = useContext(ChallengeContext);
+  const navigation = useNavigation<any>();
+  const { colors, isDark } = useThemeColors();
 
-// Typed Navigation for Type Safety
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
-
-const HomeScreen = () => {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Load Data on Mount
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      const data = await fetchChallenges();
-      setChallenges(data);
-    } catch (error) {
-      console.error("Failed to load challenges", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading && challenges.length === 0) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+        <Spinner size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
+      
+      <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+        <Text fontSize="$8" fontWeight="800" color={colors.text} marginBottom="$2">
+          Daily Goals 🎯
+        </Text>
+      </View>
+
       <FlatList
         data={challenges}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <ChallengeCard 
-            challenge={item} 
-            onPress={() => navigation.navigate('Details', { challenge: item })}
-          />
+          <View style={{ paddingHorizontal: 16 }}> 
+            <ChallengeCard 
+              item={item} 
+              onPress={() => navigation.navigate('Details', { challenge: item })} 
+            />
+          </View>
         )}
-        contentContainerStyle={styles.listContent}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={colors.text} />
+        }
+        contentContainerStyle={{ paddingBottom: 80, paddingTop: 10 }} // Extra padding for FAB
       />
+
+      {/* Floating Action Button (FAB) */}
+      <TouchableOpacity 
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={() => navigation.navigate('Create')}
+        activeOpacity={0.8}
+      >
+        <Text fontSize={30} color="white" lineHeight={30}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  center: {
-    flex: 1,
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  listContent: {
-    padding: 16,
-  },
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  }
 });
-
-export default HomeScreen;

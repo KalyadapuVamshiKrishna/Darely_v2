@@ -1,46 +1,98 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Challenge } from '../types';
+import { View, StyleSheet, Pressable } from 'react-native'; // Standard RN components for layout
+import { Text, XStack } from 'tamagui';
+import { Challenge } from '../data/types';
+import { useThemeColors } from '../hooks/useThemeColors';
 
-interface ChallengeCardProps {
-  challenge: Challenge;
+interface Props {
+  item: Challenge;
   onPress: () => void;
 }
 
-const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, onPress }) => {
+export const ChallengeCard = ({ item, onPress }: Props) => {
+  const { colors, isDark } = useThemeColors();
+
+  // "Chip" style logic: Returns { bg, text } based on difficulty
+  const getBadgeStyle = (diff: string) => {
+    switch(diff) {
+      case 'Easy': 
+        return { bg: isDark ? '#1B3320' : '#DCFCE7', text: isDark ? '#4ADE80' : '#166534' }; // Soft Green
+      case 'Medium': 
+        return { bg: isDark ? '#451A03' : '#FFEDD5', text: isDark ? '#FDBA74' : '#9A3412' }; // Soft Orange
+      case 'Hard': 
+        return { bg: isDark ? '#450A0A' : '#FEE2E2', text: isDark ? '#F87171' : '#991B1B' }; // Soft Red
+      default: 
+        return { bg: '#E0F2FE', text: '#075985' };
+    }
+  };
+
+  const badge = getBadgeStyle(item.difficulty);
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+    <Pressable 
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.cardContainer, 
+        { 
+          backgroundColor: colors.cardBg,
+          borderColor: colors.border,
+          transform: [{ scale: pressed ? 0.98 : 1 }] // Subtle press animation
+        }
+      ]}
+    >
       <View style={styles.header}>
-        <Text style={styles.title}>{challenge.title}</Text>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{challenge.category}</Text>
+        <Text 
+          fontSize={18} 
+          fontWeight="700" 
+          width="65%" 
+          color={colors.text} 
+          numberOfLines={1}
+        >
+          {item.title}
+        </Text>
+        
+        {/* The "Chip" Badge */}
+        <View style={[styles.badge, { backgroundColor: badge.bg }]}>
+          <Text fontSize={12} fontWeight="700" color={badge.text}>
+            {item.difficulty}
+          </Text>
         </View>
       </View>
-      
-      <Text style={styles.description} numberOfLines={2}>
-        {challenge.description}
+
+      <Text 
+        fontSize={12} 
+        color={colors.primary} 
+        fontWeight="600" 
+        textTransform="uppercase" 
+        marginBottom={8}
+      >
+        {item.category}
       </Text>
       
-      <View style={styles.footer}>
-        <Text style={styles.difficulty}>Diff: {challenge.difficulty}</Text>
-      </View>
-    </TouchableOpacity>
+      <Text 
+        fontSize={14} 
+        lineHeight={20} 
+        color={colors.subText} 
+        numberOfLines={2}
+      >
+        {item.description}
+      </Text>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
+  cardContainer: {
+    borderRadius: 16,
     padding: 16,
-    borderRadius: 12,
     marginBottom: 16,
-    // Shadow for iOS
-    shadowColor: '#000',
+    borderWidth: 1,
+    // Elevation / Shadows
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    // Elevation for Android
-    elevation: 3,
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   header: {
     flexDirection: 'row',
@@ -48,40 +100,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1, // Allows title to take space vs badge
-  },
   badge: {
-    backgroundColor: '#e0f2fe',
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
-    marginLeft: 8,
-  },
-  badgeText: {
-    color: '#0284c7',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  description: {
-    color: '#666',
-    fontSize: 14,
-    marginBottom: 12,
-    lineHeight: 20,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-  },
-  difficulty: {
-    fontSize: 12,
-    color: '#888',
-    fontWeight: '500',
-    fontStyle: 'italic',
-  },
+    borderRadius: 12,
+  }
 });
-
-export default ChallengeCard;
