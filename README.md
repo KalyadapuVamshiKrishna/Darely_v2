@@ -111,6 +111,17 @@ Expo 54 uses React 19 Beta, which breaks Tamagui's static compiler.
 * Add unit tests for Context logic.
 * Add Zod validation for form inputs.
 
+## ScreenShots
+
+![Home Screen](assets/home_light.png)
+![Details Screen](assets/details_light.png)
+![Create Challenge](assets/createPage_light.jpeg)
+![Home Screen](assets/home_dark.jpeg)
+![Details Screen](assets/detailsPage_dark.jpeg)
+![Create Challenge](assets/createChallenge_dark.jpeg)
+
+
+
 ## Author
 
 Built with passion and TypeScript.
